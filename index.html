@@ -1,25 +1,150 @@
 <!DOCTYPE html>
 <html lang="ca">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Meteo Catalunya</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(to bottom, #bcd3ff, #d8e4ff);
+      min-height: 100vh;
+    }
+
+    /* Menú superior */
+    header {
+      background: #3a6cf4;
+      color: white;
+      padding: 10px 0;
+      position: sticky;
+      top: 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      z-index: 10;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      font-weight: 600;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      transition: 0.2s;
+    }
+
+    nav a:hover {
+      color: #ffe35c;
+    }
+
+    /* Contingut principal */
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 70px;
+    }
+
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 300px;
+    }
+
+    input {
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    button {
+      background: #3a6cf4;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #3358cc;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>☀️ Meteo Catalunya</h1>
-    <input type="text" id="cityInput" placeholder="Escriu una ciutat (ex: Barcelona)" />
-    <button id="searchBtn">Buscar</button>
 
-    <div id="weatherBox" class="hidden">
-      <h2 id="cityName"></h2>
-      <p id="temp"></p>
-      <p id="desc"></p>
-      <p id="humidity"></p>
+  <header>
+    <nav>
+      <a href="#" id="linkTemps">Temps actual</a>
+      <a href="#" id="linkRadar">Radar</a>
+      <a href="#" id="linkPrevisio">Previsió</a>
+      <a href="#" id="linkSobre">Sobre</a>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="card" id="tempsSection">
+      <h2>☀️ Meteo Catalunya</h2>
+      <input type="text" id="cityInput" placeholder="Barcelona">
+      <button id="searchBtn">Buscar</button>
+
+      <div id="weatherBox" class="hidden">
+        <h3 id="cityName"></h3>
+        <p id="temp"></p>
+        <p id="desc"></p>
+        <p id="humidity"></p>
+      </div>
+    </div>
+
+    <div class="card hidden" id="radarSection">
+      <h2>🌧️ Radar</h2>
+      <p>Pròximament: radar de pluges de Catalunya.</p>
+    </div>
+
+    <div class="card hidden" id="previsioSection">
+      <h2>📅 Previsió</h2>
+      <p>Pròximament: previsió de 3 dies.</p>
+    </div>
+
+    <div class="card hidden" id="sobreSection">
+      <h2>ℹ️ Sobre</h2>
+      <p>Pàgina creada per mostrar el temps a Catalunya en temps real.</p>
     </div>
   </div>
 
   <script src="script.js"></script>
+  <script>
+    // Mostrar i amagar seccions
+    const sections = {
+      temps: document.getElementById("tempsSection"),
+      radar: document.getElementById("radarSection"),
+      previsio: document.getElementById("previsioSection"),
+      sobre: document.getElementById("sobreSection"),
+    };
+
+    document.getElementById("linkTemps").addEventListener("click", () => showSection("temps"));
+    document.getElementById("linkRadar").addEventListener("click", () => showSection("radar"));
+    document.getElementById("linkPrevisio").addEventListener("click", () => showSection("previsio"));
+    document.getElementById("linkSobre").addEventListener("click", () => showSection("sobre"));
+
+    function showSection(name) {
+      Object.values(sections).forEach(sec => sec.classList.add("hidden"));
+      sections[name].classList.remove("hidden");
+    }
+  </script>
 </body>
 </html>
