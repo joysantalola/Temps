@@ -5,11 +5,11 @@ const cityInput = document.getElementById("cityInput");
 const weatherBox = document.getElementById("weatherBox");
 const previsioSection = document.getElementById("previsioSection");
 
+// 🔍 Buscar el temps actual
 searchBtn.addEventListener("click", async () => {
   const city = cityInput.value.trim();
   if (!city) return;
 
-  // Temps actual
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${city},ES&units=metric&lang=ca&appid=${apiKey}`;
 
   try {
@@ -21,23 +21,26 @@ searchBtn.addEventListener("click", async () => {
       return;
     }
 
-    mostrarTemps(data);
+    mostrarTemps(data, city);
     obtenirPrevisio(city);
   } catch (error) {
     alert("Error en obtenir les dades del temps.");
   }
 });
 
-function mostrarTemps(data) {
+// 🌤️ Mostrar el temps actual
+function mostrarTemps(data, city) {
   document.getElementById("cityName").textContent = data.name;
   document.getElementById("temp").textContent = `🌡️ ${data.main.temp.toFixed(1)} °C`;
   document.getElementById("desc").textContent = `☁️ ${data.weather[0].description}`;
   document.getElementById("humidity").textContent = `💧 Humitat: ${data.main.humidity}%`;
   weatherBox.classList.remove("hidden");
+
+  // 💾 Guardar la ciutat a localStorage
   localStorage.setItem("ciutat", city);
 }
 
-// --- NOVA FUNCIÓ: previsió de 3 dies ---
+// --- 🌦️ Previsió de 3 dies ---
 async function obtenirPrevisio(city) {
   const forecastURL = `https://api.openweathermap.org/data/2.5/forecast?q=${city},ES&units=metric&lang=ca&appid=${apiKey}`;
 
@@ -63,6 +66,7 @@ async function obtenirPrevisio(city) {
   }
 }
 
+// 🗓️ Mostrar previsió
 function mostrarPrevisio(dies) {
   previsioSection.innerHTML = `
     <h2>📅 Previsió 3 dies</h2>
@@ -90,3 +94,13 @@ function mostrarPrevisio(dies) {
     container.appendChild(card);
   });
 }
+
+// 🔁 Carregar automàticament la ciutat guardada
+window.addEventListener("load", () => {
+  const ciutatGuardada = localStorage.getItem("ciutat");
+  if (ciutatGuardada) {
+    cityInput.value = ciutatGuardada;
+    searchBtn.click(); // carrega automàticament el temps i previsió
+  }
+});
+
