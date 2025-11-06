@@ -19,14 +19,14 @@ searchBtn.addEventListener("click", async () => {
       return;
     }
 
-    // --- Previsió (també usada per estimar pluja diària) ---
+    // --- Previsió (per calcular pluja últimes 3 hores) ---
     const forecastURL = `https://api.openweathermap.org/data/2.5/forecast?q=${city},ES&units=metric&lang=ca&appid=${apiKey}`;
     const forecastResponse = await fetch(forecastURL);
     const forecastData = await forecastResponse.json();
 
-    const precipitacioDia = calcularPlujaDiaria(forecastData.list);
+    const precipitacioUltimes3H = calcularPlujaUltimes3Hores(forecastData.list);
 
-    mostrarTemps(data, city, precipitacioDia);
+    mostrarTemps(data, city, precipitacioUltimes3H);
     obtenirPrevisio(city);
   } catch (error) {
     alert("Error en obtenir les dades del temps.");
@@ -34,22 +34,22 @@ searchBtn.addEventListener("click", async () => {
   }
 });
 
-function calcularPlujaDiaria(list) {
-  // Suma la precipitació (rain.3h) de les últimes 24 hores
+// ✅ Nova funció: Precipitació acumulada últimes 3 hores
+function calcularPlujaUltimes3Hores(list) {
   const ara = Date.now();
-  const fa24h = ara - 24 * 60 * 60 * 1000;
+  const fa3h = ara - 3 * 60 * 60 * 1000;
 
   const acumulada = list
     .filter(item => {
       const dt = item.dt * 1000;
-      return dt > fa24h && dt <= ara;
+      return dt > fa3h && dt <= ara;
     })
     .reduce((sum, item) => sum + (item.rain?.["3h"] || 0), 0);
 
   return acumulada.toFixed(1);
 }
 
-function mostrarTemps(data, city, precipitacioDia) {
+function mostrarTemps(data, city, precipitacioUltimes3H) {
   const rafega = data.wind?.gust ? `${data.wind.gust.toFixed(1)} km/h` : "—";
 
   document.getElementById("cityName").textContent = data.name;
@@ -60,7 +60,7 @@ function mostrarTemps(data, city, precipitacioDia) {
   document.getElementById("desc").textContent = `☁️ ${data.weather[0].description}`;
   document.getElementById("humidity").innerHTML = `
     💧 Humitat: ${data.main.humidity}%<br>
-    🌧️ Precipitació acumulada (24h): ${precipitacioDia} mm<br>
+    🌧️ Precipitació acumulada (3h): ${precipitacioUltimes3H} mm<br>
     🌬️ Vent: ${data.wind.speed.toFixed(1)} km/h | Ràfega: ${rafega}
   `;
 
@@ -127,5 +127,6 @@ window.addEventListener("load", () => {
     searchBtn.click();
   }
 });
+
 
 
