@@ -3,37 +3,28 @@ const apiKey = "633398cd39ac0d9a5db4942368703100";
 const searchBtn = document.getElementById("searchBtn");
 const cityInput = document.getElementById("cityInput");
 const weatherBox = document.getElementById("weatherBox");
+const previsioSection = document.getElementById("previsioSection");
 
 searchBtn.addEventListener("click", async () => {
   const city = cityInput.value.trim();
   if (!city) return;
 
+  // Temps actual
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${city},ES&units=metric&lang=ca&appid=${apiKey}`;
 
   try {
     const response = await fetch(url);
     const data = await response.json();
 
-    // Si no hay resultados válidos, usar datos falsos
-    if (!response.ok || !data.main) {
-      console.warn("Usant dades simulades (API no disponible)");
-      mostrarTemps({
-        name: city,
-        main: { temp: 21.3, humidity: 62 },
-        weather: [{ description: "cel clar" }]
-      });
+    if (!response.ok) {
+      alert("Error en obtenir les dades del temps.");
       return;
     }
 
     mostrarTemps(data);
-
+    obtenirPrevisio(city);
   } catch (error) {
-    console.warn("Error en obtenir dades, usant simulació");
-    mostrarTemps({
-      name: city,
-      main: { temp: 21.3, humidity: 62 },
-      weather: [{ description: "cel clar" }]
-    });
+    alert("Error en obtenir les dades del temps.");
   }
 });
 
@@ -43,4 +34,58 @@ function mostrarTemps(data) {
   document.getElementById("desc").textContent = `☁️ ${data.weather[0].description}`;
   document.getElementById("humidity").textContent = `💧 Humitat: ${data.main.humidity}%`;
   weatherBox.classList.remove("hidden");
+}
+
+// --- NOVA FUNCIÓ: previsió de 3 dies ---
+async function obtenirPrevisio(city) {
+  const forecastURL = `https://api.openweathermap.org/data/2.5/forecast?q=${city},ES&units=metric&lang=ca&appid=${apiKey}`;
+
+  try {
+    const response = await fetch(forecastURL);
+    const data = await response.json();
+
+    if (!response.ok) {
+      console.error("No s'ha pogut obtenir la previsió");
+      return;
+    }
+
+    // Filtrar només una predicció per dia (al migdia)
+    const dailyForecasts = data.list.filter(item => item.dt_txt.includes("12:00:00"));
+
+    // Agafar només 3 dies
+    const tresDies = dailyForecasts.slice(0, 3);
+
+    // Mostrar-los
+    mostrarPrevisio(tresDies);
+  } catch (error) {
+    console.error("Error obtenint la previsió:", error);
+  }
+}
+
+function mostrarPrevisio(dies) {
+  previsioSection.innerHTML = `
+    <h2>📅 Previsió 3 dies</h2>
+    <div id="forecastContainer" style="display: flex; gap: 10px; justify-content: center;"></div>
+  `;
+
+  const container = document.getElementById("forecastContainer");
+
+  dies.forEach(dia => {
+    const date = new Date(dia.dt_txt);
+    const options = { weekday: "long" };
+    const diaSetmana = date.toLocaleDateString("ca-ES", options);
+
+    const card = document.createElement("div");
+    card.style.background = "white";
+    card.style.padding = "15px";
+    card.style.borderRadius = "12px";
+    card.style.boxShadow = "0 2px 10px rgba(0,0,0,0.1)";
+    card.style.width = "120px";
+    card.innerHTML = `
+      <h4>${diaSetmana}</h4>
+      <p>🌡️ ${dia.main.temp.toFixed(1)} °C</p>
+      <p>☁️ ${dia.weather[0].description}</p>
+    `;
+    container.appendChild(card);
+  });
 }
