@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Previsió | Meteo Catalunya</title>
+  <style>
+    body {
+      font-family: "Inter", sans-serif;
+      background: linear-gradient(to bottom, #bcd4ff, #cfe0ff);
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Barra de navegació */
+    nav {
+      background: #3b5bfe;
+      color: white;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      padding: 1rem;
+      font-weight: bold;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      transition: 0.2s;
+    }
+
+    nav a:hover {
+      opacity: 0.8;
+      text-decoration: underline;
+    }
+
+    /* Contingut principal */
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 90vh;
+      flex-direction: column;
+    }
+
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 90%;
+      max-width: 700px;
+    }
+
+    .forecast {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .day {
+      background: #f3f5ff;
+      border-radius: 12px;
+      padding: 1rem;
+      width: 140px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .day img {
+      width: 60px;
+      height: 60px;
+    }
+
+    .day h4 {
+      margin: 0.5rem 0;
+      text-transform: capitalize;
+    }
+
+    .day p {
+      margin: 0.2rem 0;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html">Temps actual</a>
+    <a href="radar.html">Radar</a>
+    <a href="previsio.html">Previsió</a>
+    <a href="sobre.html">Sobre</a>
+  </nav>
+
+  <div class="container">
+    <div class="card">
+      <h2>📅 Previsió de 3 dies</h2>
+      <div id="forecast" class="forecast">Carregant dades...</div>
+    </div>
+  </div>
+
+  <script>
+    const apiKey = "633398cd39ac0d9a5db4942368703100";
+
+    async function carregarPrevisio() {
+      const ciutat = "Barcelona";
+      const url = `https://api.openweathermap.org/data/2.5/forecast?q=${ciutat},ES&units=metric&lang=ca&appid=${apiKey}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        const daily = data.list
+          .filter(e => e.dt_txt.includes("12:00:00"))
+          .slice(0, 3);
+
+        const forecastDiv = document.getElementById("forecast");
+        forecastDiv.innerHTML = "";
+
+        daily.forEach(d => {
+          const date = new Date(d.dt_txt);
+          const dia = date.toLocaleDateString("ca-ES", { weekday: "long" });
+          const icona = d.weather[0].icon;
+          const desc = d.weather[0].description;
+          const temp = d.main.temp.toFixed(1);
+
+          const dayHTML = `
+            <div class="day">
+              <h4>${dia}</h4>
+              <img src="https://openweathermap.org/img/wn/${icona}@2x.png" alt="icona del temps">
+              <p><strong>${temp}°C</strong></p>
+              <p>${desc}</p>
+            </div>
+          `;
+
+          forecastDiv.innerHTML += dayHTML;
+        });
+      } catch (err) {
+        document.getElementById("forecast").innerHTML =
+          "<p>Error carregant la previsió.</p>";
+      }
+    }
+
+    carregarPrevisio();
+  </script>
+</body>
+</html>
