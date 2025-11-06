@@ -103,7 +103,7 @@
     const apiKey = "633398cd39ac0d9a5db4942368703100";
 
     async function carregarPrevisio() {
-      const ciutat = "Barcelona";
+      const ciutat = localStorage.getItem("ciutat") || "Barcelona";
       const url = `https://api.openweathermap.org/data/2.5/forecast?q=${ciutat},ES&units=metric&lang=ca&appid=${apiKey}`;
 
       try {
