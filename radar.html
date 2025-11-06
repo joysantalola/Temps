@@ -10,7 +10,6 @@
       background: linear-gradient(to bottom, #bcd4ff, #cfe0ff);
       margin: 0;
       padding: 0;
-      overflow-x: hidden;
     }
 
     nav {
@@ -50,7 +49,6 @@
       text-align: center;
       width: 90%;
       max-width: 900px;
-      position: relative;
     }
 
     iframe {
@@ -59,77 +57,6 @@
       height: 500px;
       border-radius: 12px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-
-    button.toggle-btn {
-      background: #3b5bfe;
-      color: white;
-      border: none;
-      padding: 0.7rem 1.5rem;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.3s;
-      margin-bottom: 1rem;
-    }
-
-    button.toggle-btn:hover {
-      background: #2c47d3;
-    }
-
-    /* --- Estil del radar del sol --- */
-    #radarSol {
-      position: relative;
-      width: 100%;
-      height: 500px;
-      border-radius: 12px;
-      overflow: hidden;
-      background: linear-gradient(to bottom, #9ad9ff, #e7f3ff);
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      display: none;
-    }
-
-    .sol {
-      position: absolute;
-      top: 15%;
-      left: 70%;
-      width: 100px;
-      height: 100px;
-      background: radial-gradient(circle, #ffec8b, #ffcf33);
-      border-radius: 50%;
-      box-shadow: 0 0 60px 15px #ffd633;
-      animation: brilla 3s infinite alternate;
-    }
-
-    @keyframes brilla {
-      from { transform: scale(1); opacity: 1; }
-      to { transform: scale(1.1); opacity: 0.8; }
-    }
-
-    .nuvol {
-      position: absolute;
-      background: white;
-      border-radius: 50%;
-      animation: moure 30s linear infinite;
-    }
-
-    .nuvol::before,
-    .nuvol::after {
-      content: '';
-      position: absolute;
-      background: white;
-      border-radius: 50%;
-    }
-
-    .nuvol1 { width: 120px; height: 70px; top: 30%; left: -150px; animation-delay: 0s; }
-    .nuvol2 { width: 150px; height: 90px; top: 55%; left: -200px; animation-delay: 10s; }
-
-    .nuvol::before { width: 80px; height: 80px; top: -20px; left: 10px; }
-    .nuvol::after { width: 60px; height: 60px; top: -10px; left: 70px; }
-
-    @keyframes moure {
-      from { transform: translateX(0); }
-      to { transform: translateX(120vw); }
     }
   </style>
 </head>
@@ -143,53 +70,13 @@
 
   <div class="container">
     <div class="card">
-      <h2 id="titolRadar">🌧️ Radar de pluges</h2>
-      <button class="toggle-btn" id="toggleRadar">Canvia a radar del sol ☀️</button>
-
-      <!-- Radar real -->
+      <h2>🌧️ Radar de pluges</h2>
       <iframe 
-        id="radarReal"
         src="https://www.rainviewer.com/map.html?loc=41.3851,2.1734,7&oFa=1&oC=1&oU=1&oCS=1&oF=0&oAP=0&oAR=0&oAO=1&oAL=1&oAW=1#"
         allowfullscreen>
       </iframe>
-
-      <!-- Radar del sol -->
-      <div id="radarSol">
-        <div class="sol"></div>
-        <div class="nuvol nuvol1"></div>
-        <div class="nuvol nuvol2"></div>
-      </div>
-
-      <p id="descripcioRadar">Radar de precipitació en temps real (RainViewer).</p>
+      <p>Radar de precipitació en temps real (RainViewer).</p>
     </div>
   </div>
-
-  <script>
-    const toggleBtn = document.getElementById("toggleRadar");
-    const radarReal = document.getElementById("radarReal");
-    const radarSol = document.getElementById("radarSol");
-    const titol = document.getElementById("titolRadar");
-    const descripcio = document.getElementById("descripcioRadar");
-
-    toggleBtn.addEventListener("click", () => {
-      const showingReal = radarReal.style.display !== "none";
-      
-      if (showingReal) {
-        radarReal.style.display = "none";
-        radarSol.style.display = "block";
-        titol.textContent = "☀️ Radar del Sol";
-        descripcio.textContent = "Cel clar i tranquil sobre Catalunya.";
-        toggleBtn.textContent = "Canvia a radar de pluges 🌧️";
-      } else {
-        radarReal.style.display = "block";
-        radarSol.style.display = "none";
-        titol.textContent = "🌧️ Radar de pluges";
-        descripcio.textContent = "Radar de precipitació en temps real (RainViewer).";
-        toggleBtn.textContent = "Canvia a radar del sol ☀️";
-      }
-    });
-  </script>
 </body>
 </html>
-
-
