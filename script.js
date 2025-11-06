@@ -29,3 +29,11 @@ searchBtn.addEventListener("click", async () => {
     alert("Error en obtenir les dades del temps.");
   }
 });
+// TEMPORAL: simular datos si la API no responde
+if (!data.main) {
+  data = {
+    name: city,
+    main: { temp: 21.3, humidity: 62 },
+    weather: [{ description: "cel clar" }]
+  };
+}
