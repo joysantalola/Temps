@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meteo Catalunya</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>☀️ Meteo Catalunya</h1>
+    <input type="text" id="cityInput" placeholder="Escriu una ciutat (ex: Barcelona)" />
+    <button id="searchBtn">Buscar</button>
+
+    <div id="weatherBox" class="hidden">
+      <h2 id="cityName"></h2>
+      <p id="temp"></p>
+      <p id="desc"></p>
+      <p id="humidity"></p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
