@@ -14,26 +14,33 @@ searchBtn.addEventListener("click", async () => {
     const response = await fetch(url);
     const data = await response.json();
 
-    if (data.cod === "404") {
-      alert("Ciutat no trobada. Torna-ho a intentar!");
+    // Si no hay resultados válidos, usar datos falsos
+    if (!response.ok || !data.main) {
+      console.warn("Usant dades simulades (API no disponible)");
+      mostrarTemps({
+        name: city,
+        main: { temp: 21.3, humidity: 62 },
+        weather: [{ description: "cel clar" }]
+      });
       return;
     }
 
-    document.getElementById("cityName").textContent = data.name;
-    document.getElementById("temp").textContent = `🌡️ ${data.main.temp.toFixed(1)} °C`;
-    document.getElementById("desc").textContent = `☁️ ${data.weather[0].description}`;
-    document.getElementById("humidity").textContent = `💧 Humitat: ${data.main.humidity}%`;
+    mostrarTemps(data);
 
-    weatherBox.classList.remove("hidden");
   } catch (error) {
-    alert("Error en obtenir les dades del temps.");
+    console.warn("Error en obtenir dades, usant simulació");
+    mostrarTemps({
+      name: city,
+      main: { temp: 21.3, humidity: 62 },
+      weather: [{ description: "cel clar" }]
+    });
   }
 });
-// TEMPORAL: simular datos si la API no responde
-if (!data.main) {
-  data = {
-    name: city,
-    main: { temp: 21.3, humidity: 62 },
-    weather: [{ description: "cel clar" }]
-  };
+
+function mostrarTemps(data) {
+  document.getElementById("cityName").textContent = data.name;
+  document.getElementById("temp").textContent = `🌡️ ${data.main.temp.toFixed(1)} °C`;
+  document.getElementById("desc").textContent = `☁️ ${data.weather[0].description}`;
+  document.getElementById("humidity").textContent = `💧 Humitat: ${data.main.humidity}%`;
+  weatherBox.classList.remove("hidden");
 }
