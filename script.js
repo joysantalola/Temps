@@ -9,26 +9,47 @@ searchBtn.addEventListener("click", async () => {
   const city = cityInput.value.trim();
   if (!city) return;
 
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city},ES&units=metric&lang=ca&appid=${apiKey}`;
-
   try {
+    // --- Temps actual ---
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city},ES&units=metric&lang=ca&appid=${apiKey}`;
     const response = await fetch(url);
     const data = await response.json();
-
     if (!response.ok) {
       alert("Error en obtenir les dades del temps.");
       return;
     }
 
-    mostrarTemps(data, city);
+    // --- Previsió (també usada per estimar pluja diària) ---
+    const forecastURL = `https://api.openweathermap.org/data/2.5/forecast?q=${city},ES&units=metric&lang=ca&appid=${apiKey}`;
+    const forecastResponse = await fetch(forecastURL);
+    const forecastData = await forecastResponse.json();
+
+    const precipitacioDia = calcularPlujaDiaria(forecastData.list);
+
+    mostrarTemps(data, city, precipitacioDia);
     obtenirPrevisio(city);
   } catch (error) {
     alert("Error en obtenir les dades del temps.");
+    console.error(error);
   }
 });
 
-function mostrarTemps(data, city) {
-  const precipitacio = data.rain?.["1h"] || data.snow?.["1h"] || 0; // pluja o neu última hora
+function calcularPlujaDiaria(list) {
+  // Suma la precipitació (rain.3h) de les últimes 24 hores
+  const ara = Date.now();
+  const fa24h = ara - 24 * 60 * 60 * 1000;
+
+  const acumulada = list
+    .filter(item => {
+      const dt = item.dt * 1000;
+      return dt > fa24h && dt <= ara;
+    })
+    .reduce((sum, item) => sum + (item.rain?.["3h"] || 0), 0);
+
+  return acumulada.toFixed(1);
+}
+
+function mostrarTemps(data, city, precipitacioDia) {
   const rafega = data.wind?.gust ? `${data.wind.gust.toFixed(1)} km/h` : "—";
 
   document.getElementById("cityName").textContent = data.name;
@@ -39,7 +60,7 @@ function mostrarTemps(data, city) {
   document.getElementById("desc").textContent = `☁️ ${data.weather[0].description}`;
   document.getElementById("humidity").innerHTML = `
     💧 Humitat: ${data.main.humidity}%<br>
-    🌧️ Precipitació última hora: ${precipitacio} mm<br>
+    🌧️ Precipitació acumulada (24h): ${precipitacioDia} mm<br>
     🌬️ Vent: ${data.wind.speed.toFixed(1)} km/h | Ràfega: ${rafega}
   `;
 
@@ -106,4 +127,5 @@ window.addEventListener("load", () => {
     searchBtn.click();
   }
 });
+
 
