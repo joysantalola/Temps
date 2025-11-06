@@ -34,6 +34,7 @@ function mostrarTemps(data) {
   document.getElementById("desc").textContent = `☁️ ${data.weather[0].description}`;
   document.getElementById("humidity").textContent = `💧 Humitat: ${data.main.humidity}%`;
   weatherBox.classList.remove("hidden");
+  localStorage.setItem("ciutat", city);
 }
 
 // --- NOVA FUNCIÓ: previsió de 3 dies ---
