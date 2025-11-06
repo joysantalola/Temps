@@ -12,7 +12,6 @@
       padding: 0;
     }
 
-    /* Barra de navegació */
     nav {
       background: #3b5bfe;
       color: white;
@@ -34,7 +33,6 @@
       text-decoration: underline;
     }
 
-    /* Contingut principal */
     .container {
       display: flex;
       justify-content: center;
@@ -110,29 +108,39 @@
         const res = await fetch(url);
         const data = await res.json();
 
-        const daily = data.list
-          .filter(e => e.dt_txt.includes("12:00:00"))
-          .slice(0, 3);
+        // Agrupem per dia
+        const dies = {};
+        data.list.forEach(e => {
+          const dia = e.dt_txt.split(" ")[0];
+          if (!dies[dia]) dies[dia] = [];
+          dies[dia].push(e);
+        });
 
+        // Preparem els tres pròxims dies
         const forecastDiv = document.getElementById("forecast");
         forecastDiv.innerHTML = "";
 
-        daily.forEach(d => {
-          const date = new Date(d.dt_txt);
-          const dia = date.toLocaleDateString("ca-ES", { weekday: "long" });
-          const icona = d.weather[0].icon;
-          const desc = d.weather[0].description;
-          const temp = d.main.temp.toFixed(1);
+        const keys = Object.keys(dies).slice(0, 3);
+        keys.forEach(k => {
+          const entrades = dies[k];
+          const temps = entrades.map(e => e.main.temp);
+          const min = Math.min(...temps).toFixed(1);
+          const max = Math.max(...temps).toFixed(1);
+
+          const migdia = entrades.find(e => e.dt_txt.includes("12:00:00")) || entrades[0];
+          const icona = migdia.weather[0].icon;
+          const desc = migdia.weather[0].description;
+          const date = new Date(k);
+          const diaNom = date.toLocaleDateString("ca-ES", { weekday: "long" });
 
           const dayHTML = `
             <div class="day">
-              <h4>${dia}</h4>
+              <h4>${diaNom}</h4>
               <img src="https://openweathermap.org/img/wn/${icona}@2x.png" alt="icona del temps">
-              <p><strong>${temp}°C</strong></p>
+              <p><strong>${max}°C</strong> / ${min}°C</p>
               <p>${desc}</p>
             </div>
           `;
-
           forecastDiv.innerHTML += dayHTML;
         });
       } catch (err) {
@@ -140,6 +148,11 @@
           "<p>Error carregant la previsió.</p>";
       }
     }
+
+    carregarPrevisio();
+  </script>
+</body>
+</html>
 
     carregarPrevisio();
   </script>
